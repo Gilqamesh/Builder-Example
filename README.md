@@ -1,66 +1,58 @@
 # Builder‑Example
 
-This repository provides a minimal workspace to demonstrate how to consume **Builder** as a module‑based build orchestrator. Its scope is deliberately narrow: learn how to add Builder as a dependency, define modules, declare dependencies and invoke the build. It is not a place to learn about Builder’s internal architecture; plugin authoring guidelines and ABI details live in the [Builder](./modules/builder) repository.
+A concise workspace demonstrating how to consume **Builder** as a module-based build orchestrator. For Builder internals and ABI details, see the [Builder](https://github.com/Gilqamesh/Builder) repository.
 
 ## Workspace layout
-
 ```
 .
-├─ modules/               # Contains one folder per module
-│  ├─ builder/            # Builder module (git submodule)
-│  ├─ <module>/           # Example modules
-├─ artifacts/             # Versioned build outputs
-├─ run_latest_driver.cpp  # Bootstrap driver
-├─ *.sh                   # Optional wrapper scripts (run/debug)
+├─ modules/               # builder/ (submodule) + example modules
+├─ artifacts/             # versioned build outputs
+├─ run_latest_driver.cpp  # C++ helper to locate/run the latest builder_driver
+├─ driver.sh              # build (if needed) + run a target module
+├─ binary.sh              # run the latest-built binary for a module
+├─ graph.svg              # graph of the modules/ folder
 └─ LICENSE
 ```
 
-**Invariants**:
+## Usage
 
-- Each directory under `modules/` is a module, and the module name equals its directory name.
-- Modules declare dependencies in a `deps.json` file and implement build logic in a `builder_plugin.cpp` file.
-- All build outputs go under the `artifacts/` directory in versioned subfolders.
+### Clone and init
+```bash
+git clone https://github.com/Gilqamesh/Builder-Example.git
+cd Builder-Example
+git submodule update --init --recursive
+```
 
-## Bootstrapping the build
+### driver.sh — build and run a target module
+- Builds `builder_driver` if missing, then runs the requested module.
+- `-g` runs under `gdb`, attached to the latest `builder_driver` invocation for the target.
+```bash
+./driver.sh <target_module>
+./driver.sh <target_module> -g
+```
 
-To set up a new workspace:
+### binary.sh — run the latest-built binary for a module
+- Locates the newest artifact for `<target_module>` and executes `<binary_name>` from it.
+```bash
+./binary.sh <target_module> <binary_name>
+```
 
-1. Create the `modules/` directory and initialize a git repository.
-2. Add Builder as a submodule:
+### run_latest_driver.cpp — C++ helper
+- Same purpose as `driver.sh`, implemented in C++.
+- Builds (if needed) and runs the latest `builder_driver`, then invokes the target module.
+```bash
+clang++ -std=c++23 -o run_latest_driver run_latest_driver.cpp
+./run_latest_driver <target_module>
+```
 
-   ```bash
-   git submodule add https://github.com/Gilqamesh/Builder.git modules/builder
-   ```
+## Graph (modules/)
+![Module graph](graph.svg)
 
-3. Compile a one‑shot driver from Builder’s sources:
-
-   ```bash
-   clang++ -std=c++23 modules/builder/*.cpp -o builder_driver
-   ```
-
-   Then run the driver to build your target module:
-
-   ```bash
-   ./builder_driver <root_dir> <modules_dir> <module_name> <artifacts_dir>
-   ```
-
-   The driver locates modules, validates dependencies, builds Builder itself if necessary, and finally builds the requested module.
-
-For convenience, the `run_latest_driver.cpp` in this repository locates the newest Builder artifact in `artifacts/builder/`. If no artifact exists, it compiles Builder from the submodule, runs it once to install itself into `artifacts/`, and removes the temporary binary before re‑running the installed Builder. Wrapper scripts like `run.sh` and `debug.sh` call the same logic but allow you to run or debug a module with minimal typing.
-
-## Module anatomy
-
-Each example module follows a simple contract:
-
-- **`deps.json`** lists two arrays: `builder_deps` for modules needed to compile your plugin and `module_deps` for modules that your outputs depend on at link or runtime. Builder validates these graphs.
-- **`builder_plugin.cpp`** defines two C‑linked functions—`builder__build_self` and `builder__build_module`—that build the module’s plugin and outputs, respectively. See the Builder README for authoring guidelines and the API definition.
-
-Modules intended to be used as `builder_deps` must compile and export static libraries with position‑independent code (PIC) so that Builder can link them into plugins.
-
-## Artifacts and versioning
-
-Builder places build products in versioned directories under `artifacts/<module>/<module>@<version>/`. Versions are computed from the module’s source tree, its `deps.json`, and the versions of its builder dependencies. When you update a module or one of its dependencies, Builder computes a new version and writes fresh artifacts.
+How to read the graph:
+- Rounded boxes (SCCs) group modules in a strongly connected component.
+- Boxes are modules.
+- Solid arrows: builder dependencies (e.g., modules built by `builder`).
+- Dashed arrows: module-to-module dependencies.
 
 ## License
-
-This example uses the same MIT license as Builder. See `LICENSE`.
+MIT. See `LICENSE`.
