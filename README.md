@@ -8,7 +8,7 @@ A concise workspace demonstrating how to consume **Builder** as a module-based b
 ├─ modules/               # builder/ (submodule) + example modules
 ├─ artifacts/             # versioned build outputs
 ├─ run_latest_driver.cpp  # C++ helper to locate/run the latest builder_driver
-├─ driver.sh              # build (if needed) + run a target module
+├─ driver.sh              # build the target module
 ├─ binary.sh              # run the latest-built binary for a module
 ├─ graph.svg              # graph of the modules/ folder
 └─ LICENSE
