@@ -51,7 +51,7 @@ clang++ -std=c++23 -o run_latest_driver run_latest_driver.cpp
 How to read it:
 - Rounded boxes (SCCs) are strongly connected components of modules (those, whose runtime dependencies depend on each other).
 - Boxes are modules.
-- Solid arrows are **builder dependencies**.
+- Solid arrows are **builder plugin dependencies**.
 - Dashed arrows are **module dependencies**.
 
 ## License
