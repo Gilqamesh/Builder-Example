@@ -49,7 +49,7 @@ clang++ -std=c++23 -o run_latest_driver run_latest_driver.cpp
 ![Module graph](graph.svg)
 
 How to read it:
-- Rounded boxes (SCCs) are strongly connected components of modules.
+- Rounded boxes (SCCs) are strongly connected components of modules (those, whose runtime dependencies depend on each other).
 - Boxes are modules.
 - Solid arrows are **builder dependencies**.
 - Dashed arrows are **module dependencies**.
