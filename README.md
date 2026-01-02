@@ -19,7 +19,7 @@ This repository is a minimal workspace demonstrating how to consume **Builder** 
    git submodule update --init --recursive
    ```
 
-2. **Compile cli.cpp** — compile a module and its dependencies, outputting to `artifacts/`:
+2. **Compile cli.cpp**
 
    ```bash
    clang++ -std=c++23 cli.cpp -o cli
@@ -29,18 +29,23 @@ This repository is a minimal workspace demonstrating how to consume **Builder** 
 
    ```bash
    ./cli F # builds module F, i.e., runs its builder_plugin.cpp implementation
-   ./cli F f_static # will find the latest versioned artifact directory of the 'F' module, and run 'f_static' under its installed binaries directory
+   ./cli F f_static # run 'f_static' under latest installed binaries directory 
    ```
 
 ## Module graph
 
-![Module graph](graph.svg)
-
 The graph shows the dependency disposition between the modules.
+- Rectangles represent individual modules.
+- Arrows represents dependency relations.
+- Rounded rectangles represent strongly connected components, where each module is cyclically dependent on all the others.
+
+![Module graph](graph.svg)
 
 ## Requirements
 
-- Requirements of `Builder`
+- C++23 compiler
+- Unix environment
+- Requirements of [Builder](https://github.com/Gilqamesh/Builder)
 
 ## License
 
