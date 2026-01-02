@@ -9,4 +9,5 @@ void f(int r) {
     e(r);
     a(r);
     std::cout << "Bye from f" << std::endl;
+    
 }

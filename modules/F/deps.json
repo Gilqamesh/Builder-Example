@@ -1,9 +1,6 @@
 {
-    "builder_deps": [
-        "builder",
+    "deps": [
         "E",
         "A"
-    ],
-    "module_deps": [
     ]
 }

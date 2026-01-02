@@ -1,4 +1,5 @@
 artifacts
-a.out
-run_latest_driver
 graph.dot
+cli
+builder_cli
+
