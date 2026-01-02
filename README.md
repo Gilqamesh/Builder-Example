@@ -1,6 +1,6 @@
 # Builder‑Example
 
-This repository is a minimal workspace demonstrating how to consume **Builder** as a module‑oriented build orchestrator. It shows how modules live in a workspace, how artifacts are versioned, and how to build and run modules using simple scripts. For more details on Builder’s internals and API, see the [Builder](https://github.com/Gilqamesh/Builder) repository.
+This repository is a minimal workspace demonstrating how to consume **Builder** as a module‑oriented dependency resolved. For more details on Builder’s internals and API, see the [Builder](https://github.com/Gilqamesh/Builder) repository.
 
 ## Contents
 
@@ -19,32 +19,28 @@ This repository is a minimal workspace demonstrating how to consume **Builder** 
    git submodule update --init --recursive
    ```
 
-2. **Build a module** — compile a module and its dependencies, outputting to `artifacts/`:
+2. **Compile cli.cpp** — compile a module and its dependencies, outputting to `artifacts/`:
 
    ```bash
-   ./build.sh <module_name>
+   clang++ -std=c++23 cli.cpp -o cli
    ```
 
-3. **Run a module’s binary** — run the most recent binary built for `<module_name>`, passing any extra arguments through:
+3. **Run cli on the target module, optionally running the module's produced binary as a post-step**
 
    ```bash
-   ./run.sh <module_name> <binary_name> [args...]
+   ./cli F # builds module F, i.e., runs its builder_plugin.cpp implementation
+   ./cli F f_static # will find the latest versioned artifact directory of the 'F' module, and run 'f_static' under its installed binaries directory
    ```
 
 ## Module graph
 
 ![Module graph](graph.svg)
 
-The graph shows the dependency disposition between the modules:
-
-- Rectangles represent individual modules.
-- Solid arrows represent **builder plugin dependencies**.
-- Dashed arrows represent **module dependencies**.
-- Rounded rectangles represent strongly connected components that represents cyclic dependencies.
+The graph shows the dependency disposition between the modules.
 
 ## Requirements
 
-- Same as for the `Builder` module
+- Requirements of `Builder`
 
 ## License
 
