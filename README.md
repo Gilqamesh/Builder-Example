@@ -29,7 +29,7 @@ This repository is a minimal workspace demonstrating how to consume **Builder** 
 
    ```bash
    ./cli F # builds module F, i.e., runs its builder_plugin.cpp implementation
-   ./cli F f_static # run 'f_static' under latest installed binaries directory 
+   ./cli F f_static # also run 'f_static' under latest installed binaries directory 
    ```
 
 ## Module graph
