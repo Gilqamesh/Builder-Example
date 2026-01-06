@@ -15,19 +15,20 @@ int main(int argc, char** argv) {
     }
 
     try {
-        const auto builder_dir = std::filesystem::path("builder");
         const auto modules_dir = std::filesystem::path("modules");
         const auto module_dir = std::filesystem::path(argv[1]);
         const auto artifacts_dir = std::filesystem::path("artifacts");
 
+        const auto builder_dir = modules_dir / "builder";
+
         const auto builder_cli_path = builder_dir / "cli";
         const auto builder_cli_src_path = builder_dir / "cli.cpp";
 
-        const auto root_dir = builder_dir.parent_path().empty() ? "." : builder_dir.parent_path();
+        const auto root_dir = modules_dir.parent_path().empty() ? "." : modules_dir.parent_path();
 
         {
             const auto cli = std::filesystem::canonical("/proc/self/exe");
-            const auto cli_src = root_dir / std::filesystem::path(std::source_location::current().file_name());
+            const auto cli_src = root_dir / std::filesystem::path(std::source_location::current().file_name()).filename();
 
             std::error_code ec;
             const auto cli_last_write_time = std::filesystem::last_write_time(cli, ec);
@@ -83,43 +84,28 @@ int main(int argc, char** argv) {
             throw std::runtime_error(std::format("expected '{}' to exist but it does not", builder_cli_path.string()));
         }
 
-        const auto run_builder_cli_command = std::format("./{} {} {} {} {}", builder_cli_path.string(), builder_dir.string(), modules_dir.string(), module_dir.string(), artifacts_dir.string());
-        std::cout << run_builder_cli_command << std::endl;
-        const int run_builder_cli_command_result = std::system(run_builder_cli_command.c_str());
-        if (run_builder_cli_command_result) {
-            throw std::runtime_error(std::format("failed to run '{}', command exited with code '{}'", builder_cli_path.string(), run_builder_cli_command_result));
+        std::string exec_command;
+        std::vector<std::string> exec_string_args;
+        exec_string_args.push_back(builder_cli_path.string());
+        exec_string_args.push_back(modules_dir.string());
+        exec_string_args.push_back(module_dir.string());
+        exec_string_args.push_back(artifacts_dir.string());
+        for (int i = 2; i < argc; ++i) {
+            exec_string_args.push_back(argv[i]);
         }
-
-        if (3 <= argc) {
-            const auto binary_relative_to_module = argv[2];
-            const auto module_artifact_dir = artifacts_dir / module_dir;
-            std::filesystem::path module_artifact_latest_versioned_dir;
-            for (const auto& entry : std::filesystem::directory_iterator(module_artifact_dir)) {
-                if (!entry.is_directory()) {
-                    continue ;
-                }
-                const auto module_artifact_versioned_dir = entry.path();
-                if (module_artifact_latest_versioned_dir < module_artifact_versioned_dir) {
-                    module_artifact_latest_versioned_dir = module_artifact_versioned_dir;
-                }
+        std::vector<char*> exec_args;
+        for (const auto& exec_string_arg : exec_string_args) {
+            exec_args.push_back(const_cast<char*>(exec_string_arg.c_str()));
+            if (!exec_command.empty()) {
+                exec_command += " ";
             }
-            if (module_artifact_latest_versioned_dir.empty()) {
-                throw std::runtime_error(std::format("expected at least one versioned artifact directory in '{}' but found none", module_artifact_dir.string()));
-            }
+            exec_command += exec_string_arg;
+        }
+        exec_args.push_back(nullptr);
 
-            const auto module_binaries_path = module_artifact_latest_versioned_dir / "module";
-            const auto binary_path = module_binaries_path / binary_relative_to_module;
-            if (!std::filesystem::exists(binary_path)) {
-                throw std::runtime_error(std::format("binary '{}' does not exist", binary_path.string()));
-            }
-
-            std::string binary_command = "./" + binary_path.string();
-            for (int i = 3; i < argc; ++i) {
-                binary_command += " " + std::string(argv[i]);
-            }
-
-            std::cout << binary_command << std::endl;
-            std::system(binary_command.c_str());
+        std::cout << exec_command << std::endl;
+        if (execv(builder_cli_path.c_str(), exec_args.data()) == -1) {
+            throw std::runtime_error(std::format("failed to execv '{}': {}", builder_cli_path.string(), std::strerror(errno)));
         }
     } catch (std::exception& e) {
         std::cerr << std::format("{}: {}", argv[0], e.what()) << std::endl;

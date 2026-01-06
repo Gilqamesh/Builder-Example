@@ -28,8 +28,8 @@ This repository is a minimal workspace demonstrating how to consume **Builder** 
 3. **Run cli on the target module, optionally running the module's produced binary as a post-step**
 
    ```bash
-   ./cli F # builds module F, i.e., runs its builder_plugin.cpp implementation
-   ./cli F f_static # also run 'f_static' under latest installed binaries directory 
+   ./cli F # builds module F, i.e., runs its builder.cpp implementation
+   ./cli F f_shared
    ```
 
 ## Module graph
