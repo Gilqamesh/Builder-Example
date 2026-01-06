@@ -25,11 +25,11 @@ This repository is a minimal workspace demonstrating how to consume **Builder** 
    clang++ -std=c++23 cli.cpp -o cli
    ```
 
-3. **Run cli on the target module, optionally running the module's produced binary as a post-step**
+3. **Run cli on the target module with optional arguments pass-through**
 
    ```bash
-   ./cli F # builds module F, i.e., runs its builder.cpp implementation
-   ./cli F f_shared
+   ./cli F # builds module `F`, i.e., runs its builder.cpp implementation
+   ./cli F f_shared # also run the produced `f_shared` binary of the `F` module
    ```
 
 ## Module graph
