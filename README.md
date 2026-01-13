@@ -24,7 +24,7 @@ This repository is a minimal workspace demonstrating how to use `Builder`. For m
    This builds the Builder CLI from the `builder` module and installs it into the artifacts directory.
 
    ```bash
-   make -C modules/builder -f bootstrap.mk bootstrap MODULES_DIR=modules ARTIFACTS_DIR=artifacts
+   make -f modules/builder/bootstrap.mk bootstrap MODULES_DIR=modules ARTIFACTS_DIR=artifacts
    ```
 
 3. **Build a target module**
