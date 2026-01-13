@@ -1,5 +1,5 @@
-#include <modules/D/D.h>
-#include <modules/E/E.h>
+#include <D/D.h>
+#include <E/E.h>
 
 #include <iostream>
 

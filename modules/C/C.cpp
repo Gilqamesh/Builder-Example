@@ -1,5 +1,5 @@
-#include <modules/C/C.h>
-#include <modules/B/B.h>
+#include <C/C.h>
+#include <B/B.h>
 
 #include <iostream>
 
