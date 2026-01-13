@@ -1,6 +1,6 @@
 # Builder‑Example
 
-This repository is a minimal workspace demonstrating how to consume **Builder** as a module‑oriented dependency resolved. For more details on Builder’s internals and API, see the [Builder](https://github.com/Gilqamesh/Builder) repository.
+This repository is a minimal workspace demonstrating how to use `Builder`. For more details on Builder’s internals and API, see the [Builder](https://github.com/Gilqamesh/Builder) repository.
 
 ## Contents
 
@@ -19,34 +19,41 @@ This repository is a minimal workspace demonstrating how to consume **Builder** 
    git submodule update --init --recursive
    ```
 
-2. **Compile cli.cpp**
+2. **Bootstrap Builder**
+
+   This builds the Builder CLI from the `builder` module and installs it into the artifacts directory.
 
    ```bash
-   clang++ -std=c++23 cli.cpp -o cli
+   make -C modules/builder -f bootstrap.mk bootstrap MODULES_DIR=modules ARTIFACTS_DIR=artifacts
    ```
 
-3. **Run cli on the target module with optional arguments pass-through**
+3. **Build a target module**
+
+   This command builds the target module `F`.
 
    ```bash
-   ./cli F # builds module `F`, i.e., runs its builder.cpp implementation
-   ./cli F f_shared # also run the produced `f_shared` binary of the `F` module
+   ./artifacts/builder/alias/import/install/cli modules F artifacts
+   ```
+
+   If a binary name is provided, the CLI executes that binary and forwards all remaining arguments to it.
+
+   ```bash
+   ./artifacts/builder/alias/import/install/cli modules F artifacts f_shared
    ```
 
 ## Module graph
 
-The graph shows the dependency disposition between the modules.
+The graph shows the dependency structure between the modules.
 - Rectangles represent individual modules.
-- Arrows represents dependency relations.
+- Arrows represent dependency relations.
 - Rounded rectangles represent strongly connected components, where each module is cyclically dependent on all the others.
 
 ![Module graph](graph.svg)
 
 ## Requirements
 
-- C++23 compiler
-- Unix environment
 - Requirements of [Builder](https://github.com/Gilqamesh/Builder)
 
 ## License
 
-MIT. See `LICENSE`.
+See [LICENSE](LICENSE).
