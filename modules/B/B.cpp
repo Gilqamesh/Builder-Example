@@ -1,4 +1,5 @@
-#include <B/B.h>
+#include "B.h"
+
 #include <A/A.h>
 
 #include <iostream>
